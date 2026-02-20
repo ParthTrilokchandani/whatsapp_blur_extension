@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Privacy Shield</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e18;
+    --surface: #16162a;
+    --surface2: #1e1e35;
+    --border: rgba(255,255,255,0.07);
+    --accent: #25D366;
+    --accent2: #128C7E;
+    --red: #ff6b6b;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --radius: 10px;
+  }
+
+  body {
+    width: 340px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0d1f17 0%, #0e0e18 100%);
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .header-text h1 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .header-text p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Not-on-whatsapp warning */
+  #not-on-wa {
+    padding: 24px 18px;
+    text-align: center;
+    color: var(--muted);
+    display: none;
+  }
+  #not-on-wa .icon { font-size: 32px; margin-bottom: 8px; }
+  #not-on-wa p { font-size: 12px; line-height: 1.6; }
+  #not-on-wa a { color: var(--accent); text-decoration: none; }
+
+  /* Main content */
+  #main { display: none; }
+
+  /* Section */
+  .section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* Picker buttons */
+  .picker-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .pick-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .pick-btn:hover { background: #252545; border-color: rgba(255,255,255,0.15); }
+  .pick-btn .icon { font-size: 16px; }
+  .pick-btn.blur-btn:hover { border-color: rgba(37,211,102,0.4); }
+  .pick-btn.hide-btn:hover { border-color: rgba(255,107,107,0.4); }
+
+  /* Presets */
+  .preset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .preset-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .preset-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .preset-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .preset-btn {
+    flex: 1;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 2px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.02em;
+  }
+  .preset-btn.blur {
+    background: rgba(37,211,102,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(37,211,102,0.2);
+  }
+  .preset-btn.blur:hover { background: rgba(37,211,102,0.22); }
+  .preset-btn.hide {
+    background: rgba(255,107,107,0.1);
+    color: var(--red);
+    border: 1px solid rgba(255,107,107,0.2);
+  }
+  .preset-btn.hide:hover { background: rgba(255,107,107,0.2); }
+
+  /* Active rules */
+  .rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+  .rules-list::-webkit-scrollbar { width: 4px; }
+  .rules-list::-webkit-scrollbar-track { background: transparent; }
+  .rules-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .rule-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border-radius: 7px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  .rule-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .rule-badge.blur { background: rgba(37,211,102,0.15); color: var(--accent); }
+  .rule-badge.hide { background: rgba(255,107,107,0.15); color: var(--red); }
+
+  .rule-label {
+    flex: 1;
+    font-size: 11px;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rule-remove {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px;
+    border-radius: 4px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+  }
+  .rule-remove:hover { color: var(--red); }
+
+  .no-rules {
+    text-align: center;
+    padding: 16px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .no-rules .icon { font-size: 24px; margin-bottom: 6px; display: block; }
+
+  /* Footer */
+  .footer {
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-hint {
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .clear-all-btn {
+    background: none;
+    border: 1px solid rgba(255,107,107,0.25);
+    color: var(--red);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .clear-all-btn:hover { background: rgba(255,107,107,0.1); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🛡</div>
+  <div class="header-text">
+    <h1>Privacy Shield <span style="color:var(--accent);font-size:10px;font-weight:500">v2.1</span></h1>
+    <p>by Agent P · WhatsApp Web blur &amp; hide tool</p>
+  </div>
+</div>
+
+<!-- Not on WhatsApp Web -->
+<div id="not-on-wa">
+  <div class="icon">🔒</div>
+  <p>Open <a href="https://web.whatsapp.com" target="_blank">web.whatsapp.com</a><br>to use Privacy Shield.</p>
+</div>
+
+<!-- Main UI -->
+<div id="main">
+
+  <!-- Element Picker -->
+  <div class="section">
+    <div class="section-title">Pick any element</div>
+    <div class="picker-row">
+      <button class="pick-btn blur-btn" id="btn-pick-blur">
+        <span class="icon">👁</span>
+        <div>
+          <div>Blur it</div>
+          <div style="font-size:10px;color:#7a7a9a;font-weight:400">hover to reveal</div>
+        </div>
+      </button>
+      <button class="pick-btn hide-btn" id="btn-pick-hide">
+        <span class="icon">🙈</span>
+        <div>
+          <div>Hide it</div>
+          <div style="font-size:10px;color:#7a7a9a;font-weight:400">hover to reveal</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Presets -->
+  <div class="section">
+    <div class="section-title">Quick Presets — click any element to blur or hide</div>
+    <div class="preset-grid" id="preset-grid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- Active Rules -->
+  <div class="section">
+    <div class="section-title">Active Rules <span id="rule-count" style="color:var(--accent)"></span></div>
+    <div class="rules-list" id="rules-list">
+      <div class="no-rules"><span class="icon">✨</span>No rules active yet</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-hint">👆 Hover any blurred element to reveal</div>
+    <button class="clear-all-btn" id="btn-clear-all">Clear All</button>
+  </div>
+
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

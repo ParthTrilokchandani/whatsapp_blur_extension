@@ -1,0 +1,113 @@
+/* WhatsApp Privacy Shield v2.1 - Content Styles */
+/* Created by Agent P */
+
+/* ── Blur mode ── */
+.wps-blur {
+  filter: blur(7px) !important;
+  transition: filter 0.2s ease !important;
+  border-radius: 3px;
+  cursor: pointer !important;
+}
+.wps-blur:hover,
+.wps-blur *:hover {
+  filter: blur(0px) !important;
+}
+/* Parent reveal: if you hover a blurred child's parent, reveal it too */
+*:hover > .wps-blur {
+  filter: blur(0px) !important;
+}
+
+/* ── Hide mode (show on hover) ── */
+.wps-hide {
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  cursor: pointer !important;
+  min-width: 4px;
+  min-height: 4px;
+}
+.wps-hide:hover {
+  opacity: 1 !important;
+}
+*:hover > .wps-hide {
+  opacity: 1 !important;
+}
+
+/* ── Highlight overlay for element picker ── */
+.wps-picking-mode * {
+  cursor: crosshair !important;
+}
+
+.wps-highlight-hover {
+  outline: 2px dashed #25D366 !important;
+  outline-offset: 2px !important;
+  background: rgba(37, 211, 102, 0.08) !important;
+}
+
+/* ── Toast notification ── */
+#wps-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1a1a2e;
+  color: #e0e0e0;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+#wps-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Picker panel ── */
+#wps-picker-bar {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  border: 1px solid rgba(37, 211, 102, 0.4);
+  border-radius: 12px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 999999;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #e0e0e0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+#wps-picker-bar span {
+  color: #25D366;
+  font-weight: 600;
+}
+#wps-picker-bar button {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #e0e0e0;
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#wps-picker-bar button:hover {
+  background: rgba(255,255,255,0.15);
+}
+#wps-picker-bar button.cancel {
+  border-color: rgba(255, 80, 80, 0.4);
+  color: #ff6b6b;
+}
+#wps-picker-bar button.cancel:hover {
+  background: rgba(255, 80, 80, 0.12);
+}
