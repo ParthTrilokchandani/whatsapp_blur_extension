@@ -34,7 +34,7 @@
 
 1. [Download the latest release](../../releases) or clone this repo:
    ```bash
-   git clone https://github.com/your-username/whatsapp-privacy-shield.git
+   git clone https://github.com/ParthTrilokchandani/whatsapp-privacy-shield.git
    ```
 2. Open Chrome and navigate to `chrome://extensions`
 3. Enable **Developer mode** using the toggle in the top-right corner
@@ -120,7 +120,7 @@ WhatsApp's `_ak*` internal classes have been stable for years, but Meta can chan
 | `activeTab` | Communicate with the WhatsApp Web tab |
 | `host_permissions: web.whatsapp.com` | Inject the content script into WhatsApp Web only |
 
-The extension **never** reads your messages, contacts, or any WhatsApp data. It only adds and removes CSS classes on DOM elements.
+## The extension **never** reads your messages, contacts, or any WhatsApp data. It only adds and removes CSS classes on DOM elements.
 
 ---
 
