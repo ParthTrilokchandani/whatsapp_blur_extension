@@ -13,8 +13,8 @@
 
 ##  Features
 
-- ** Element Picker** — Click any element on the page to blur or hide it
-- ** Quick Presets** — One-click privacy for common elements:
+- **Element Picker** — Click any element on the page to blur or hide it
+- **Quick Presets** — One-click privacy for common elements:
   - Contact Names
   - Chat List
   - Profile Photos
@@ -22,9 +22,9 @@
   - Timestamps
   - Last Message Previews
   - Unread Badges
-- ** Hover to Reveal** — Blurred/hidden elements show on mouse hover
-- ** Persistent Rules** — Settings saved across browser sessions via Chrome storage
-- ** Easy Management** — View, remove individual rules, or clear all at once
+- **Hover to Reveal** — Blurred/hidden elements show on mouse hover
+- **Persistent Rules** — Settings saved across browser sessions via Chrome storage
+- **Easy Management** — View, remove individual rules, or clear all at once
 
 ---
 
