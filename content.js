@@ -1,4 +1,4 @@
-// WhatsApp Privacy Shield - Content Script v2.1
+// WhatsApp Privacy Shield - Content Script v2.2
 // Created by Agent P
 
 (function () {
@@ -12,17 +12,17 @@
   };
 
   // ── Predefined quick targets ───────────────────────────────────────────────
-  // Selectors derived from live WhatsApp Web DOM inspection (Feb 2026).
-  // WhatsApp uses stable internal classes (_ak8q, _ak8n etc.) alongside
-  // rotating Tailwind-style ones (x1abc123). We target the stable _ak* ones.
+  // Selectors derived from live WhatsApp Web DOM inspection (May 2026).
+  // WhatsApp now uses data-testid attributes as the stable anchors alongside
+  // rotating Tailwind-style classes (x1abc123). We target data-testid.
   const PRESETS = {
     contactNames: {
       label: 'Contact Names',
       selectors: [
-        '._ak8q span[dir="auto"][title]',
-        '._ak8q span[title]',
+        '[data-testid="cell-frame-title"] span[dir="auto"]',
+        '[data-testid="cell-frame-title"] span[title]',
         '[data-testid="conversation-info-header-chat-title"] span',
-        'header ._amid span[dir]',
+        'header [data-testid="conversation-header"] span[dir]',
       ]
     },
     chatList: {
@@ -30,13 +30,12 @@
       selectors: [
         '[data-testid="chat-list"]',
         '#pane-side',
-        '._ak_3',
       ]
     },
     profilePhotos: {
       label: 'Profile Photos',
       selectors: [
-        '._ak8h img',
+        '[data-testid="cell-frame-container"] img',
         'img[src*="cdn.whatsapp.net"]',
         'img[src*="whatsapp.net"]',
         '[data-testid="conversation-info-header"] img',
@@ -54,7 +53,7 @@
     timestamps: {
       label: 'Timestamps',
       selectors: [
-        '._ak8i span[style*="--x-fontSize"]',
+        '[data-testid="cell-frame-primary-detail"] span',
         '[data-testid="msg-meta"]',
         'span[data-testid="msg-meta"]',
       ]
@@ -62,17 +61,16 @@
     lastMessage: {
       label: 'Last Message Preview',
       selectors: [
-        '._ak8k span[dir="ltr"]',
-        '._ak8k span[dir="auto"]',
-        '._ak8k span[aria-label]',
-        '._ak8k',
+        '[data-testid="last-msg-status"] span[dir="ltr"]',
+        '[data-testid="last-msg-status"] span[dir="auto"]',
+        '[data-testid="cell-frame-secondary"] span[dir]',
+        '[data-testid="cell-frame-secondary"]',
       ]
     },
     unreadBadge: {
       label: 'Unread Badges',
       selectors: [
         '[data-testid="icon-unread-count"]',
-        '._ahlv',
         '[aria-label*="nread"]',
       ]
     },
@@ -151,19 +149,81 @@
   // ── Picker mode ───────────────────────────────────────────────────────────
   function startPicker(mode) {
     state.pickMode = mode;
-    document.body.classList.add('wps-picking-mode');
 
-    // Picker bar
+    // Overlay owns all events — WhatsApp's handlers never see the click.
+    // Bar is a child of overlay so there is no z-index race between them.
+    const overlay = document.createElement('div');
+    overlay.id = 'wps-pick-overlay';
+
     const bar = document.createElement('div');
     bar.id = 'wps-picker-bar';
     bar.innerHTML = `
-      <span>🎯 ${mode === 'blur' ? 'Blur' : 'Hide'} Picker</span>
-      Click any element on the page to ${mode} it. Hover to preview.
+      <span>🎯 ${mode === 'blur' ? 'Blur' : 'Hide'} Picker — </span>
+      click any element to ${mode} it
       <button class="cancel" id="wps-cancel-pick">✕ Cancel</button>
     `;
-    document.body.appendChild(bar);
+    overlay.appendChild(bar);
+    document.body.appendChild(overlay);
 
-    document.getElementById('wps-cancel-pick').onclick = stopPicker;
+    document.getElementById('wps-cancel-pick').addEventListener('click', (e) => {
+      e.stopPropagation();
+      stopPicker();
+    });
+
+    function whatsappElAt(x, y) {
+      overlay.style.pointerEvents = 'none';
+      const el = document.elementFromPoint(x, y);
+      overlay.style.pointerEvents = 'auto';
+      return (el && el !== overlay && !el.closest('#wps-picker-bar') && !el.closest('#wps-pick-overlay > *:not(#wps-picker-bar)')) ? el : null;
+    }
+
+    overlay.addEventListener('mousemove', (e) => {
+      if (e.target.closest('#wps-picker-bar')) return;
+      overlay.style.pointerEvents = 'none';
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      overlay.style.pointerEvents = 'auto';
+      if (!under || under === overlay) return;
+      if (state.hoverEl && state.hoverEl !== under) {
+        state.hoverEl.classList.remove('wps-highlight-hover');
+      }
+      state.hoverEl = under;
+      under.classList.add('wps-highlight-hover');
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target.closest('#wps-picker-bar')) return;
+
+      overlay.style.pointerEvents = 'none';
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      overlay.style.pointerEvents = 'auto';
+
+      if (!under || under === overlay) return;
+
+      if (state.hoverEl) {
+        state.hoverEl.classList.remove('wps-highlight-hover');
+        state.hoverEl = null;
+      }
+
+      const selector = buildSelector(under);
+      const cssClass = state.pickMode === 'blur' ? 'wps-blur' : 'wps-hide';
+      const pickerMode = state.pickMode;
+
+      const rule = {
+        id: uid(),
+        selector,
+        selectors: [selector],
+        cssClass,
+        label: `Custom (${under.dataset.testid || under.tagName.toLowerCase()})`,
+        custom: true,
+      };
+
+      state.rules.push(rule);
+      applyRule(rule);
+      saveRules();
+      stopPicker();
+      showToast(`✅ Element will ${pickerMode === 'blur' ? 'blur' : 'hide'} — hover to reveal`);
+      notifyPopup();
+    });
   }
 
   function stopPicker() {
@@ -173,74 +233,46 @@
       state.hoverEl.classList.remove('wps-highlight-hover');
       state.hoverEl = null;
     }
+    const overlay = document.getElementById('wps-pick-overlay');
+    if (overlay) overlay.remove();
     const bar = document.getElementById('wps-picker-bar');
     if (bar) bar.remove();
   }
 
-  // ── Mouse events for picker ───────────────────────────────────────────────
-  document.addEventListener('mouseover', (e) => {
-    if (!state.pickMode) return;
-    if (e.target.closest('#wps-picker-bar')) return;
-
-    if (state.hoverEl && state.hoverEl !== e.target) {
-      state.hoverEl.classList.remove('wps-highlight-hover');
-    }
-    state.hoverEl = e.target;
-    e.target.classList.add('wps-highlight-hover');
-  }, true);
-
-  document.addEventListener('mouseout', (e) => {
-    if (!state.pickMode) return;
-    e.target.classList.remove('wps-highlight-hover');
-  }, true);
-
-  document.addEventListener('click', (e) => {
-    if (!state.pickMode) return;
-    if (e.target.closest('#wps-picker-bar')) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    const el = e.target;
-    el.classList.remove('wps-highlight-hover');
-
-    // Build a decent selector
-    const selector = buildSelector(el);
-    const cssClass = state.pickMode === 'blur' ? 'wps-blur' : 'wps-hide';
-    const mode = state.pickMode;
-
-    const rule = {
-      id: uid(),
-      selector,
-      selectors: [selector],
-      cssClass,
-      label: `Custom (${el.dataset.testid || el.tagName.toLowerCase()})`,
-      custom: true,
-    };
-
-    state.rules.push(rule);
-    applyRule(rule);
-    saveRules();
-    stopPicker();
-    showToast(`✅ Element will ${mode === 'blur' ? 'blur' : 'hide'} — hover to reveal`);
-    notifyPopup();
-  }, true);
-
   // ── Selector builder ──────────────────────────────────────────────────────
-  function buildSelector(el) {
-    // 1. data-testid on element itself
-    if (el.dataset.testid) return `[data-testid="${el.dataset.testid}"]`;
 
-    // 2. Walk up to find a testid ancestor and use it with child tag
+  // Normalizes WhatsApp testids that carry a dynamic numeric index so the
+  // resulting selector matches all rows, not just the one that was clicked.
+  // e.g. "list-item-0" → [data-testid^="list-item-"]
+  function testidSelector(testid) {
+    const normalized = testid.replace(/-\d+$/, '-');
+    if (normalized !== testid) return `[data-testid^="${normalized}"]`;
+    return `[data-testid="${testid}"]`;
+  }
+
+  function buildSelector(el) {
+    // 1. Stable testid on the element itself
+    if (el.dataset.testid) return testidSelector(el.dataset.testid);
+
+    // 2. Walk up to 10 levels to find a stable testid ancestor.
+    //    Skip purely-dynamic ones (list-item-N) in favour of deeper stable ones.
+    let best = null;
     let ancestor = el.parentElement;
-    for (let i = 0; i < 4 && ancestor && ancestor !== document.body; i++) {
+    for (let i = 0; i < 10 && ancestor && ancestor !== document.body; i++) {
       if (ancestor.dataset.testid) {
-        const tag = el.tagName.toLowerCase();
-        return `[data-testid="${ancestor.dataset.testid}"] ${tag}`;
+        const tid = ancestor.dataset.testid;
+        // Prefer stable testids (no numeric suffix) when possible
+        if (!/-\d+$/.test(tid)) {
+          const tag = el.tagName.toLowerCase();
+          return `${testidSelector(tid)} ${tag}`;
+        }
+        if (!best) best = { tid, tag: el.tagName.toLowerCase() };
       }
       ancestor = ancestor.parentElement;
     }
+    if (best) return `${testidSelector(best.tid)} ${best.tag}`;
 
-    // 3. aria-label
+    // 3. aria-label on element
     if (el.getAttribute('aria-label')) {
       return `[aria-label="${el.getAttribute('aria-label')}"]`;
     }
@@ -250,9 +282,9 @@
       return `${el.tagName.toLowerCase()}[role="${el.getAttribute('role')}"]`;
     }
 
-    // 5. tag + stable class fragments (avoid hashed ones like x1abc123)
+    // 5. tag + stable class fragments (skip hashed x0-9 and _ao3e-style classes)
     const stableClasses = [...el.classList]
-      .filter(c => !c.startsWith('wps-') && !/^x[0-9]/.test(c))
+      .filter(c => !c.startsWith('wps-') && !/^x[0-9]/.test(c) && !/^_/.test(c))
       .slice(0, 2);
 
     let sel = el.tagName.toLowerCase();

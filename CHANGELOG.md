@@ -4,6 +4,19 @@ All notable changes to **WhatsApp Privacy Shield** are documented here.
 
 ---
 
+## [2.2.0] - 2026-05-25
+
+### Fixed
+- Updated all presets to target WhatsApp's new `data-testid`-based DOM structure (replaced deprecated `_ak8*` internal class selectors)
+- Element picker now uses a full-page transparent overlay (z-index: INT_MAX) to reliably capture clicks without fighting WhatsApp's own event handlers
+- Picker bar nested inside overlay to eliminate z-index conflicts
+- `buildSelector` ancestor walk depth increased from 4 to 10 levels; dynamic testids (e.g. `list-item-0`) normalised to starts-with selectors
+
+### Changed
+- Extension version bumped to `2.2.0` in manifest
+
+---
+
 ## [2.1.0] - 2026-02-20
 
 ### Added

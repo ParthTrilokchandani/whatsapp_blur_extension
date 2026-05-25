@@ -5,16 +5,16 @@
 </p>
 
 <p align="center">
-  <b>Version 2.1</b> · Created by <b>Agent P</b><br/>
+  <b>Version 2.2</b> · Created by <b>Agent P</b><br/>
   Blur or hide any element on WhatsApp Web — hover to reveal instantly.
 </p>
 
 ---
 
-##  Features
+## ✨ Features
 
-- **Element Picker** — Click any element on the page to blur or hide it
-- **Quick Presets** — One-click privacy for common elements:
+- **🎯 Element Picker** — Click any element on the page to blur or hide it
+- **⚡ Quick Presets** — One-click privacy for common elements:
   - Contact Names
   - Chat List
   - Profile Photos
@@ -22,19 +22,19 @@
   - Timestamps
   - Last Message Previews
   - Unread Badges
-- **Hover to Reveal** — Blurred/hidden elements show on mouse hover
-- **Persistent Rules** — Settings saved across browser sessions via Chrome storage
-- **Easy Management** — View, remove individual rules, or clear all at once
+- **👁 Hover to Reveal** — Blurred/hidden elements show on mouse hover
+- **💾 Persistent Rules** — Settings saved across browser sessions via Chrome storage
+- **🗑 Easy Management** — View, remove individual rules, or clear all at once
 
 ---
 
-##  Installation
+## 🚀 Installation
 
 ### Option A: Load Unpacked (Developer Mode)
 
 1. [Download the latest release](../../releases) or clone this repo:
    ```bash
-   git clone https://github.com/ParthTrilokchandani/whatsapp_blur_extension_v2.1.0.git
+   git clone https://github.com/your-username/whatsapp-privacy-shield.git
    ```
 2. Open Chrome and navigate to `chrome://extensions`
 3. Enable **Developer mode** using the toggle in the top-right corner
@@ -42,7 +42,7 @@
 5. Select the `whatsapp-privacy-shield` folder (the one containing `manifest.json`)
 6. Open [web.whatsapp.com](https://web.whatsapp.com) — the shield is active! 🎉
 
-###  Important: Don't Move the Folder
+### ⚠️ Important: Don't Move the Folder
 
 Once loaded, Chrome references the folder by its path. If you move it:
 - Go to `chrome://extensions`
@@ -55,7 +55,7 @@ Once loaded, Chrome references the folder by its path. If you move it:
 
 ---
 
-##  How to Use
+## 🎮 How to Use
 
 ### Using Presets
 1. Click the extension icon in your Chrome toolbar
@@ -78,7 +78,7 @@ Once loaded, Chrome references the folder by its path. If you move it:
 
 ---
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 whatsapp-privacy-shield/
@@ -98,7 +98,7 @@ whatsapp-privacy-shield/
 
 ---
 
-##  Technical Notes
+## 🔧 Technical Notes
 
 - Built with **Manifest V3** (current Chrome extension standard)
 - Uses WhatsApp's stable internal `_ak*` class names and `data-testid` attributes — avoids hashed Tailwind-style classes (e.g. `x1abc123`) that rotate with updates
@@ -112,7 +112,7 @@ WhatsApp's `_ak*` internal classes have been stable for years, but Meta can chan
 
 ---
 
-##  Permissions
+## 🔒 Permissions
 
 | Permission | Why it's needed |
 |---|---|
@@ -120,17 +120,17 @@ WhatsApp's `_ak*` internal classes have been stable for years, but Meta can chan
 | `activeTab` | Communicate with the WhatsApp Web tab |
 | `host_permissions: web.whatsapp.com` | Inject the content script into WhatsApp Web only |
 
-## The extension **never** reads your messages, contacts, or any WhatsApp data. It only adds and removes CSS classes on DOM elements.
+The extension **never** reads your messages, contacts, or any WhatsApp data. It only adds and removes CSS classes on DOM elements.
 
 ---
 
-##  Changelog
+## 📜 Changelog
 
 See [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
-##  Contributing
+## 🤝 Contributing
 
 1. Fork the repo
 2. Create a feature branch: `git checkout -b feature/your-feature`
@@ -140,12 +140,12 @@ See [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
-##  License
+## 📄 License
 
 [MIT License](LICENSE) — free to use, modify, and distribute.
 
 ---
 
 <p align="center">
-  Made by <b>Agent P</b> · v2.1
+  Made with 🐧 by <b>Agent P</b> · v2.2
 </p>

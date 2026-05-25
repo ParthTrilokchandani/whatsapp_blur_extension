@@ -1,4 +1,4 @@
-// WhatsApp Privacy Shield - Popup Script v2.1
+// WhatsApp Privacy Shield - Popup Script v2.2
 // Created by Agent P
 
 const PRESETS = {
